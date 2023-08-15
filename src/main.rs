@@ -60,6 +60,8 @@ fn main() -> anyhow::Result<()> {
             votes : votes.votes,
             winner: result.possible_winners[0],
             audit,
+            trim_algorithm: None,
+            difficulty_estimate: None,
         }
     };
     let output_file : PathBuf = args.output_json_file.unwrap_or_else(||{
