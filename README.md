@@ -21,8 +21,12 @@ cargo build --release
 
 # Running
 
+
 ```bash
-./target/release/concrete_stv_to_raire path/to/your/ConcreteSTV/file.stv
+# Get a sample stv data file data.stv that is actually an IRV election
+wget https://vote.andrewconway.org/NSW%20Local%20Government/2021/City%20of%20Griffith%20Mayoral/data.stv
+# Convert data.stv (ConcreteSTV format) to data.json (raire-rs format) 
+./target/release/concrete_stv_to_raire data.stv
 ```
 
 
