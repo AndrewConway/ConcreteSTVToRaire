@@ -15,3 +15,5 @@ typed-arena = "2.0"
 raire = { path = "../raire-rs/raire" }
 # Note that this requires ConcreteSTV to be cloned
 stv = { path="../ConcreteSTV/stv" }
+nsw = { path="../ConcreteSTV/nsw" }
+federal = { path="../ConcreteSTV/federal" }
