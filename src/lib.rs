@@ -14,7 +14,7 @@ pub fn convert(input:&ElectionData,audit : Audit) -> anyhow::Result<RaireProblem
     let arena = typed_arena::Arena::<stv::ballot_metadata::CandidateIndex>::new();
     let votes = input.resolve_atl(&arena,None);
     let votes : Vec<raire::irv::Vote> = votes.into_iter().map(|v|raire::irv::Vote{ n: raire::irv::BallotPaperCount(v.n.0), prefs: v.prefs.iter().map(|c|raire::irv::CandidateIndex(c.0 as u32)).collect() }).collect();
-    let votes = Votes::new(votes,input.metadata.candidates.len());
+    let votes = Votes::new(votes,input.metadata.candidates.len())?;
     let candidates : Vec<String> = input.metadata.candidates.iter().map(|c|c.name.clone()).collect();
     let result = votes.run_election(&mut TimeOut::never())?;
     if result.possible_winners.len()!=1 { return Err(anyhow!{"Multiple winners - cannot audit"}); }
