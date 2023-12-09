@@ -7,6 +7,7 @@ use raire::RaireProblem;
 use raire::timeout::TimeOut;
 use stv::election_data::ElectionData;
 use serde_json::json;
+use stv::ballot_metadata::NumberOfCandidates;
 use stv::datasource_description::ElectionDataSource;
 use stv::parse_util::FileFinder;
 
@@ -34,7 +35,8 @@ pub fn convert(input:&ElectionData,audit : Audit) -> anyhow::Result<RaireProblem
     })
 }
 
-pub fn convert_bulk(source:&impl ElectionDataSource) -> anyhow::Result<()> {
+/// Convert everything in the ElectionDataSource. If only_one is true, the only convert iff the number of vacancies is exactly one.
+pub fn convert_bulk(source:&impl ElectionDataSource,only_one:bool) -> anyhow::Result<()> {
     let finder = FileFinder::find_ec_data_repository();
     let path = PathBuf::from(source.name().as_ref());
     for year in source.years() {
@@ -46,9 +48,11 @@ pub fn convert_bulk(source:&impl ElectionDataSource) -> anyhow::Result<()> {
             println!("{}",electorate);
             let path = path.join(format!("{}.json",electorate.replace('/',"_")));
             let data = loader.read_raw_data_best_quality(&electorate)?;
-            let audit = Audit::OneOnMargin(BallotComparisonOneOnDilutedMargin{total_auditable_ballots:raire::irv::BallotPaperCount(data.num_votes())});
-            let output = convert(&data,audit)?;
-            serde_json::to_writer(File::create(&path)?,&output)?;
+            if data.metadata.vacancies==Some(NumberOfCandidates(1)) || !only_one {
+                let audit = Audit::OneOnMargin(BallotComparisonOneOnDilutedMargin{total_auditable_ballots:raire::irv::BallotPaperCount(data.num_votes())});
+                let output = convert(&data,audit)?;
+                serde_json::to_writer(File::create(&path)?,&output)?;
+            }
         }
     }
     Ok(())
